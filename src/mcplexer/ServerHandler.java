@@ -12,9 +12,11 @@ public class ServerHandler implements Handler
    private Process serverProcess;
    private StreamReader serverReader;
    private PrintWriter writer;
+   private final Server server;
 
-   public ServerHandler(Process sp)
+   public ServerHandler(Process sp, Server relay)
    {
+      server = relay;
       serverProcess = sp;
       serverReader = new StreamReader(sp.getInputStream(),this);
       serverReader = new StreamReader(sp.getErrorStream(),this);
@@ -32,5 +34,6 @@ public class ServerHandler implements Handler
    {
       // TODO feed to server which will route to network handler
       System.out.println(s);
+      server.pipeToNetwork(s);
    }
 }

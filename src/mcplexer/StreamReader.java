@@ -19,7 +19,6 @@ public class StreamReader implements Runnable
 
    public StreamReader(InputStream is, Handler h)
    {
-      System.out.println("init serverreader...");
       handler = h;
       reader = new BufferedReader(new InputStreamReader(is));
    }
@@ -30,7 +29,12 @@ public class StreamReader implements Runnable
       {
          try {
             String in = reader.readLine();
-            handler.read(in);
+            if (in == null)
+            {
+               kill();
+            } else {
+               handler.read(in);
+            }
          } catch (IOException ex) {
             Logger.getLogger(StreamReader.class.getName()).log(Level.SEVERE, null, ex);
             kill();

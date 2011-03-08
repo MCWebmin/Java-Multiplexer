@@ -14,27 +14,41 @@ public class Server
 {
    private Process serverProcess;
    private ServerHandler serverHandler;
+   private NetworkHandler networkHandler;
 
    public Server(int maxMem, int minMem)
    {
-      Thread t = new Thread(new CommandHandler());
-      t.start();
+      // stdin command reader
+      // Thread t = new Thread(new CommandHandler());
+      // t.start();
       try {
          File f = new File("resources/minecraft_server.jar");
          System.out.println(f.exists());
          System.out.println(f.getAbsolutePath());
          serverProcess = Runtime.getRuntime().exec("java -jar -Xmx" + maxMem + "M -Xms" + minMem + "M resources/minecraft_server.jar nogui");
-         System.out.println(serverProcess == null);
-         serverHandler = new ServerHandler(serverProcess);
-         /*try {
+         networkHandler = new NetworkHandler(9503,this);
+         serverHandler = new ServerHandler(serverProcess,this);
+         /* autokill
+         try {
             Thread.sleep(3000);
          } catch (InterruptedException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
          }
          serverProcess.destroy(); */
+      
       } catch (IOException ex) {
          Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
       }
+   }
+
+   protected void pipeToNetwork(String message)
+   {
+      networkHandler.write(message);
+   }
+
+   protected void pipeToProcess(String message)
+   {
+      serverHandler.write(message);
    }
 
    private class CommandHandler implements Runnable
